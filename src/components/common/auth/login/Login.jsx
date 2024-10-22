@@ -10,6 +10,8 @@ import { ref, set } from 'firebase/database';
 import { auth, database } from '@firebase'; // Adjust this path based on your actual file structure
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
+import { signInWithCustomToken } from "firebase/auth";
+
 
 
 const Login = () => {
@@ -24,18 +26,88 @@ const Login = () => {
     const router = useRouter();
 
     useEffect(() => {
-        // Check if user is already logged in
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (user) {
-                // Redirect if user is already logged in
-                router.back(); // Redirect to home or another page
-            } else {
-                setLoading(false); // Set loading to false when done
-            }
-        });
+        const token = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('authToken='))
+            ?.split('=')[1];
 
-        return () => unsubscribe(); // Cleanup subscription on unmount
+            console.log(token)
+
+        if (token) {
+            // Authenticate the user using the token
+            signInWithCustomToken(auth, token)
+                .then((userCredential) => {
+                    // User is now authenticated on the subdomain
+                    const user = userCredential.user;
+                    console.log('User logged in on subdomain:', user);
+                    router.back(); // Optionally redirect after login
+                })
+                .catch((error) => {
+                    console.error('Error logging in with custom token:', error);
+                });
+        } else {
+            setLoading(false); // No token, stop loading
+        }
     }, [router]);
+    // useEffect(() => {
+    //     // Check if user is already logged in
+    //     const unsubscribe = onAuthStateChanged(auth, (user) => {
+    //         if (user) {
+    //             // Redirect if user is already logged in
+    //             router.back(); // Redirect to home or another page
+    //         } else {
+    //             setLoading(false); // Set loading to false when done
+    //         }
+    //     });
+
+    //     return () => unsubscribe(); // Cleanup subscription on unmount
+    // }, [router]);
+    // const { token } = router.query;
+    // console.log(token);
+
+
+    // useEffect(() => {
+    //     const verifyToken = async () => {
+    //         if (token) {
+    //             try {
+    //                 const response = await fetch('http://localhost:5000/api/verifyToken', {
+    //                     method: 'POST',
+    //                     headers: {
+    //                         'Content-Type': 'application/json',
+    //                     },
+    //                     body: JSON.stringify({ token }),
+    //                 });
+
+    //                 if (response.ok) {
+    //                     const data = await response.json();
+    //                     console.log('User authenticated:', data);
+    //                     // Set user state or store user details in Firebase
+    //                     await setUser(data.user); // Assuming data.user contains user info
+    //                     router.push('/dashboard'); // Redirect to dashboard or home page
+    //                 } else {
+    //                     console.error('Token verification failed');
+    //                     setGeneralError("Invalid token. Please log in again.");
+    //                 }
+    //             } catch (error) {
+    //                 console.error('Error verifying token:', error);
+    //             }
+    //         } else {
+    //             setLoading(false); // No token, stop loading
+    //         }
+    //     };
+
+    //     verifyToken();
+    // }, [token, router]);
+
+    
+
+
+    
+      
+
+
+
+
 
     const validateEmail = (email) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -87,9 +159,6 @@ const Login = () => {
                 firstName: existingData.firstName || user.email.split('@')[0],
             });
 
-            document.cookie = `authToken=${userCredential.user.uid}; path=/; domain=.trafyai.com`;
-            document.cookie = `authToken=${userCredential.user.uid}; path=/; domain=.blog.trafyai.com`;
-
             // Save merged data back to the database
             await set(userRef, updatedData);
 
@@ -122,13 +191,13 @@ const Login = () => {
                 firstName: user.email.split('@')[0],
             });
 
-            document.cookie = `authToken=${userCredential.user.uid}; path=/; domain=.trafyai.com`;
-            document.cookie = `authToken=${userCredential.user.uid}; path=/; domain=.blog.trafyai.com`;
+          
 
             // Save merged data back to the database
-            await set(userRef, updatedData);
+            // await set(userRef, updatedData);
+;
 
-            // router.back();
+            router.push('/');
 
         } catch (err) {
             if (err.code === 'auth/cancelled-popup-request') {

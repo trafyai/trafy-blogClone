@@ -8,17 +8,48 @@ import whiteLogo from "@public/assets/Images/common/header/blackLogo.png";
 import trafyIcon from '@public/assets/Images/common/header/trafy icon.png';
 import close1 from '@public/assets/Images/common/header/close.svg';
 import blackHamburger from "@public/assets/Images/common/header/hamburger.svg";
-import { UserAuth } from "@context/AuthContext";
 import Default from "@public/assets/Images/common/header/default.svg";
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [sessionOpen,setSessionOpen] = useState(null);
   const [hover, setHover] = useState(false);
+  const [dataOpen,setDataOpen] = useState(false);
   const timeoutRef = useRef(null);
   const menuRef = useRef(null);
   const dropdownRef = useRef(null); // New ref for dropdown
-  const router = useRouter();
-  const { user, logOut, loading } = UserAuth();
+  const router = useRouter(); 
+
+  useEffect(() => {
+    const fetchSessionCookie = async () => {
+        try {
+            const response = await fetch('http://localhost:5000/api/getSessionCookie', {
+                method: 'GET',
+                credentials: 'include', // Important to send cookies
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch session cookie');
+            }
+
+            const data = await response.json();
+            setDataOpen(data);
+            // console.log("Session Cookie:", data.session); // This may not be necessary if not included in the response
+            // console.log("Profile Picture URL:", data.profilePicURL); // Logs the public URL of the user's profile picture
+            // console.log("User Email:", data.email); // Logs the user's email
+            // console.log("User First Name:", data.firstName); // Display session cookie in console
+
+        } catch (error) {
+            console.error('Error fetching session cookie:', error);
+        }
+    };
+
+    fetchSessionCookie();
+}, []);
+
+  
+
+  // console.log("Session Cookie Use state",sessionOpen.sessionCookie);
 
   useEffect(() => {
     const handlePopState = () => {
@@ -33,6 +64,7 @@ const Header = () => {
       window.removeEventListener("popstate", handlePopState);
     };
   }, []);
+  
   
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -132,7 +164,7 @@ const Header = () => {
             </Link>
           </div>
           <div className="menu-right-d">
-            {!loading && !user ? (
+            { !dataOpen ? (
               <Link
                 href="/signup"
                 className="menu-signup"
@@ -146,7 +178,7 @@ const Header = () => {
                 <div className="user-profile-image-container"
                       >
                         <Image className="user-profile-image"
-                          src={user?.profilePicURL || Default}
+                          src={dataOpen?.profilePicURL || Default}
                           alt="Profile"
                           width={28} // Set this to match the container size
                           height={28} // Set this to match the container size
@@ -218,7 +250,7 @@ const Header = () => {
                 >
                   Resources
                 </Link>
-                {user && (
+                {dataOpen && (
                   <hr
                     style={{
                       borderBottom: "0",
@@ -228,7 +260,7 @@ const Header = () => {
                     }}
                   />
                 )}
-                {user && (
+                {dataOpen && (
                   <Link
                     href="https://trafyai.com//-settings"
                     className="menu-account-settings"
@@ -237,7 +269,7 @@ const Header = () => {
                     Account Settings
                   </Link>
                 )}
-                {user && (
+                {dataOpen  && (
                   <Link
                     href="https://trafyai.com/account-security"
                     className="menu-account-security"
@@ -246,13 +278,13 @@ const Header = () => {
                     Security
                   </Link>
                 )}
-                {user && (
+                {dataOpen  && (
                   <p className="menu-account-logout" onClick={handleLogOut}>
                     Logout
                   </p>
                 )}
               </div>
-              {user && (
+              {dataOpen  && (
                 <hr
                   style={{
                     borderBottom: "0",
@@ -263,7 +295,7 @@ const Header = () => {
                 />
               )}
               <div className="menu-right">
-                {!loading && !user ? (
+                {!dataOpen  ? (
                   <Link
                     href="/signup"
                     className="menu-signup"
@@ -290,7 +322,7 @@ const Header = () => {
                         }}
                       >
                         <Image
-                          src={user?.profilePicURL || Default}
+                          src={dataOpen ?.profilePicURL || Default}
                           alt="Profile"
                           width="23"
                           height="23"
