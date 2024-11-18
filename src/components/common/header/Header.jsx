@@ -28,18 +28,17 @@ const Header = () => {
                 credentials: 'include', // Important to send cookies
             });
 
-            if (!response.ok) {
-                throw new Error('Failed to fetch session cookie');
+            if (response.ok) {
+                const data = await response.json();
+                if(data.success == true){
+                  setDataOpen(data);
+
+                }
+
+              
             }
-
-            const data = await response.json();
-            setDataOpen(data);
-            // console.log("Session Cookie:", data.session); // This may not be necessary if not included in the response
-            // console.log("Profile Picture URL:", data.profilePicURL); // Logs the public URL of the user's profile picture
-            // console.log("User Email:", data.email); // Logs the user's email
-            // console.log("User First Name:", data.firstName); // Display session cookie in console
-
         } catch (error) {
+            // Optionally log other types of errors
             console.error('Error fetching session cookie:', error);
         }
     };
@@ -47,9 +46,11 @@ const Header = () => {
     fetchSessionCookie();
 }, []);
 
+
+
+
   
 
-  // console.log("Session Cookie Use state",sessionOpen.sessionCookie);
 
   useEffect(() => {
     const handlePopState = () => {
@@ -166,9 +167,9 @@ const Header = () => {
           <div className="menu-right-d">
             { !dataOpen ? (
               <Link
-                href="/signup"
+                href="https://trafy.ai/login"
                 className="menu-signup"
-                onClick={() => handleNavigation("/signup")}
+                onClick={() => handleNavigation("https://trafy.ai/login")}
               >
                 Get Started
               </Link>
@@ -297,9 +298,9 @@ const Header = () => {
               <div className="menu-right">
                 {!dataOpen  ? (
                   <Link
-                    href="/signup"
+                    href="https://trafy.ai/login"
                     className="menu-signup"
-                    onClick={() => handleNavigation("/signup")}
+                    onClick={() => handleNavigation("https://trafy.ai/login")}
                   >
                     Get Started
                   </Link>
