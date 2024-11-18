@@ -18,7 +18,7 @@
     "@next/third-parties": "^14.2.7",
     "axios": "^1.7.5",
     "email-validator": "^2.0.4",
-    "firebase": "^10.13.0",
+    "firebase": "^10.14.1",
     "js-cookie": "^3.0.5",
     "next": "^14.2.7",
     "react": "^18",
