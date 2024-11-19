@@ -23,7 +23,7 @@ const Header = () => {
   useEffect(() => {
     const fetchSessionCookie = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/getSessionCookie', {
+            const response = await fetch('https://trafy-newbackend-865611889264.us-central1.run.app/api/getSessionCookie', {
                 method: 'GET',
                 credentials: 'include', // Important to send cookies
             });
